@@ -31,6 +31,11 @@ let createIssue = (req,res) => {
                     let apiResponse = response.generate(true,'Reporter of the Issue is required',400,null);
                     reject(apiResponse);
                 }
+                if(check.isEmpty(req.body.issueAssignee))
+                {
+                    let apiResponse = response.generate(true,'The person to whom this issue is being assigned is required',400,null);
+                    reject(apiResponse);
+                }
             }
         }))
     }
