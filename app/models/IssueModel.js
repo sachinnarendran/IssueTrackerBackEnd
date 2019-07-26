@@ -3,12 +3,16 @@ const Schema = mongoose.Schema;
 
 const Issue = new Schema({
     issueId:{
-        type:String
+        type:String,
+        unique:true
     },
     issueTitle:{
         type:String
     },
     issueDescription:{
+        type:String
+    },
+    issueStatus:{
         type:String
     },
     issueReporter:{
@@ -17,7 +21,15 @@ const Issue = new Schema({
     issueAssignee:{
         type:String
     },
-    issueScreenshot:{
-        data:Buffer,contentType:String
+    issueScreenshotUrl:{
+        type:String
+    },
+    createdOn:{
+        type:Date,
+        default:time.now()
+    },
+    modifiedOn:{
+        type:Date,
+        default:time.now()
     }
 });
