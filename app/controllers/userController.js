@@ -232,10 +232,31 @@ let loginFunction = (req, res) => {
         })
 }
 
-
-
 // end of the login function
 
+let getAllUsers = (req,res) => {
+    UserModel.find()
+            .select('-__v -_id -password')
+            .lean()
+            .exec((err,result) => {
+                if(err)
+                {
+                    console.log(err);
+                    logger.error(err.message,'User Controller: Get All Users',10);
+                    let apiResponse = response.generate(true,'Failed to Find Users',500,null);
+                    res.send(apiResponse);
+                }
+                else if(check.isEmpty(result))
+                {
+                    logger.error(err.message,'user Controller: Get All Users',10);
+                    let apiResponse  = response.generate(true,'No Users Found',400,null);
+                    res.send(apiResponse);
+                }
+                else{
+                    let apiResponse = response.generate(false,'Users Found',200,res)
+                }
+            })
+}
 
 
 module.exports = {

@@ -104,6 +104,26 @@ let createIssue = (req,res) => {
 
 let viewAllIssue = (req,res) => {
     IssueModel.find()
+            .select('__v')
+            .lean
+            .exec((err,result) => {
+                if(err)
+                {
+                    logger.error(err.message,"View All Issue : Issue Controller",10);
+                    let apiResponse = response.generate(true,'Unable to find Issues',500,null);
+                    res.send(apiResponse);
+                }
+                else if(check.isEmpty(result))
+                {
+                    logger.error(err.message,"View All Issue: Issue Controller",10);
+                    let apiResponse = response.generate(true,'No Issues Found',400,null);
+                    res.send(apiResponse);
+                }
+                else
+                {
+                    let apiResponse = response.generate(false,'Found Issue',200,result);
+                }
+            })
 }
 
 
