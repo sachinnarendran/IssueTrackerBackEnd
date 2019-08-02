@@ -153,6 +153,40 @@ let getSingleIssue = (req,res) => {
     })
 }
 
+//Beginning of Update Issue
+let updateIssue = (req,res) => {
+    IssueModel.update({'issueId':req.body.issueId},options)
+            .select('-__v -_id')
+            .lean()
+            .exec((err,result) => {
+                if(err)
+                {
+                    if(err.code === 11000)
+                    {
+                        logger.error(err.message,"Issue Controller:Update Issue",10);
+                        let apiResponse = response.generate(true,'Update Failed for Issue, Issue ID Exists',400,null);
+                        res.send(apiResponse);
+                    }
+                    else 
+                    {
+                        logger.error(err.message,"Issue Controller:Update Issue",10);
+                        let apiResponse = response.generate(true,'Update Failed for Issue',404,null);
+                        res.send(apiResponse);
+                    }
+                }
+                else if(check.isEmpty(result))
+                {
+                        logger.error(err.message,"Issue Controller:Update Issue",10);
+                        let apiResponse = response.generate(true,"Update Failed . Because No Issue Like this Exist",404,null);
+                        res.send(apiResponse);
+                }
+                else{
+                    let apiResponse = response.generate(false,'Update Succeeded',200,result);
+                    res.send(apiResponse);
+                }
+              
+            })
+}
 
 module.exports = {
     createIssue:createIssue
