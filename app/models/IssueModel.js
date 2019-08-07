@@ -31,5 +31,8 @@ const Issue = new Schema({
     modifiedOn:{
         type:Date,
         default:time.now()
-    }
+    },
+    issueWatchers:[],
+    
+    issueComments:[]
 });

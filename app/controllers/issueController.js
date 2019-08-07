@@ -188,6 +188,51 @@ let updateIssue = (req,res) => {
             })
 }
 
+//Add Watcher
+let addWatcher = (req,res) =>
+{
+    let options = {$push: {issueWatchers: req.body.watching }};
+    IssueModel.update({'issue':req.body.issueId},options)
+                .exec((err,result) =>{
+                    if(err)
+                    {
+                        logger.error(err.message,'Issue Controller:Unable to Add Watcher due to Database Issue',10);
+                        let apiResponse = response.generate(true,'Unable to Add as watcher',500,null);
+                        res.send(apiResponse);
+                    }
+                    else
+                    {
+                        let apiResponse = response.generate(true,'Successfully Added as Watcher',200,result);
+                        res.send(apiResponse);
+                    }
+                })
+}
+
+//Add Comments Functionality
+let addComments = (req,res) => 
+{
+    let options = {$push:{issueComments: req.body.comment}}
+    IssueModel.update({'issueId':req.body.issueId},options)
+                .exec((err,result) => {
+                    if(err)
+                    {
+                        logger.error(true,'Issue Controller:Unable to Add Comments',10);
+                        let apiResponse = response.generate(true,'Unable to Add Comments',400,null);
+                        res.send(apiResponse);
+                    }
+                    else{
+                        let apiResponse = response.generate(false,'Comment Addedd Succesfully',200,result);
+                        res.send(apiResponse);
+                    }
+                })
+}
+
 module.exports = {
-    createIssue:createIssue
+    createIssue:createIssue,
+    getSingleIssue: getSingleIssue,
+    viewAllIssue:viewAllIssue,
+    updateIssue:updateIssue,
+    getSingleIssue:getSingleIssue,
+    addWatcher:addWatcher,
+    addComments:addComments
 };
