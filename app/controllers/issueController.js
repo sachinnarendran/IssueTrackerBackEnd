@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const shortid = require('shortid');
 const time = require('./../libraries/timeLib');
-const passwordLib = require('./../libraries/generatePasswordLib');
 const response = require('./../libraries/responseLib');
 const logger = require('./../libraries/loggerLib');
 const validateInput = require('./../libraries/paramsValidationLib');
@@ -13,8 +12,9 @@ const IssueModel = mongoose.model('Issue');
 let createIssue = (req,res) => {
 
     let validateIssueDetails = () =>{
-        return new(Promise((resolve,reject)=>{
-            if(req.body.issueId)
+        console.log(req.body.issueTitle);
+        return new Promise((resolve,reject)=>{
+            if(req.body.issueTitle)
             {
                 if(check.isEmpty(req.body.issueTitle))
                 {
@@ -38,10 +38,10 @@ let createIssue = (req,res) => {
                 }
                 else{
                     let apiResponse = response.generate(true,'Issue id is Mandatory,400',null);
-                    reject(apiResponse);
+                    resolve(req);
                 }
             }
-        }))
+        })
     }
 //End of Validate Issue Details Function
     let saveIssue = () => {
@@ -90,7 +90,7 @@ let createIssue = (req,res) => {
     }
 
     validateIssueDetails(req,res)
-        .then(createIssue)
+        .then(saveIssue)
         .then((resolve) => {
             let apiResponse = response.generate(false, 'Issue Created Successfuly', 200, resolve)
             res.send(apiResponse);
@@ -103,25 +103,27 @@ let createIssue = (req,res) => {
 // End of Create Issue Function
 
 let viewAllIssue = (req,res) => {
-    IssueModel.find()
-            .select('__v')
-            .lean
-            .exec((err,result) => {
+    IssueModel.find({})
+    .select('-__v -_id')
+            .lean()
+            .exec((err,issues) => {
                 if(err)
                 {
                     logger.error(err.message,"View All Issue : Issue Controller",10);
                     let apiResponse = response.generate(true,'Unable to find Issues',500,null);
                     res.send(apiResponse);
                 }
-                else if(check.isEmpty(result))
+                else if(check.isEmpty(issues))
                 {
-                    logger.error(err.message,"View All Issue: Issue Controller",10);
+                    logger.error(err.message,"ViewAllIssue: Issue Controller",10);
                     let apiResponse = response.generate(true,'No Issues Found',400,null);
                     res.send(apiResponse);
                 }
                 else
                 {
-                    let apiResponse = response.generate(false,'Found Issue',200,result);
+                    let apiResponse = response.generate(false,'Found the List of All Issue',200,issues);
+                    console.log(issues);
+                    res.send(apiResponse);
                 }
             })
 }
@@ -147,7 +149,7 @@ let getSingleIssue = (req,res) => {
         }
         else
         {
-            let apiResponse = response.generate(false,'Issues Found',200,result);
+            let apiResponse = response.generate(false,'Issue Found for the Mentioned Id',200,result);
             res.send(apiResponse);
         }
     })

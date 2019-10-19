@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
+const time = require('./../libraries/timeLib');
 
-const Issue = new Schema({
+const issueSchema = new Schema({
     issueId:{
         type:String,
         unique:true
@@ -36,3 +37,5 @@ const Issue = new Schema({
     
     issueComments:[]
 });
+
+mongoose.model('Issue',issueSchema);
