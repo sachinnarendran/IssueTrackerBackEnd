@@ -130,19 +130,19 @@ let viewAllIssue = (req,res) => {
 //End of View All Issues
 
 let getSingleIssue = (req,res) => {
-    IssueModel.findOne({'issueId':req.body.issueId})
+    IssueModel.findOne({'issueId':req.params.issueId})
     .select('-__v -_id')
     .lean()
     .exec((err,result)=>{
         if(err)
         {
             logger.error(err.message,'Get Single issue',30);
+            console.log("Issue Not Found");
             let apiResponse = response.generate(true,'Unable to find the Issue Now',500,null);
             res.send(apiResponse);
         }
         else if(check.isEmpty(result))
         {
-            logger.error(err.message,'Get Single Issue',10);
             let apiResponse = response.generate(true,'Didnt find the requested Issue',400,null);
             res.send(apiResponse);
 
