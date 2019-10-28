@@ -157,7 +157,8 @@ let getSingleIssue = (req,res) => {
 
 //Beginning of Update Issue
 let updateIssue = (req,res) => {
-    IssueModel.update({'issueId':req.body.issueId},options)
+    let options = {$set: req.body}
+    IssueModel.update({'issueId':req.params.issueId},options)
             .select('-__v -_id')
             .lean()
             .exec((err,result) => {
@@ -186,15 +187,15 @@ let updateIssue = (req,res) => {
                     let apiResponse = response.generate(false,'Update Succeeded',200,result);
                     res.send(apiResponse);
                 }
-              
             })
 }
 
 //Add Watcher
 let addWatcher = (req,res) =>
 {
+    console.log(req.body.watching);
     let options = {$push: {issueWatchers: req.body.watching }};
-    IssueModel.update({'issue':req.body.issueId},options)
+    IssueModel.update({'issueId':req.body.issueId},options)
                 .exec((err,result) =>{
                     if(err)
                     {
@@ -204,7 +205,7 @@ let addWatcher = (req,res) =>
                     }
                     else
                     {
-                        let apiResponse = response.generate(true,'Successfully Added as Watcher',200,result);
+                        let apiResponse = response.generate(false,'Successfully Added as Watcher',200,result);
                         res.send(apiResponse);
                     }
                 })
