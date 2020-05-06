@@ -103,7 +103,9 @@ let createIssue = (req,res) => {
 // End of Create Issue Function
 
 let viewAllIssue = (req,res) => {
+    let pageLimit = parseInt(req.query.pageSize);
     IssueModel.find({})
+    .limit(pageLimit)
     .select('-__v -_id')
             .lean()
             .exec((err,issues) => {
