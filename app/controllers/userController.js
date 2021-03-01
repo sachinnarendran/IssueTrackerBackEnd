@@ -123,7 +123,7 @@ let loginFunction = (req, res) => {
         })
     }
     let validatePassword = (retrievedUserDetails) => {
-        console.log("validatePassword");
+        console.log("validatePassword Details :" + retrievedUserDetails);
         return new Promise((resolve, reject) => {
             passwordLib.comparePassword(req.body.password, retrievedUserDetails.password, (err, isMatch) => {
                 if (err) {

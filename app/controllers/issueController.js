@@ -6,6 +6,7 @@ const logger = require('./../libraries/loggerLib');
 const validateInput = require('./../libraries/paramsValidationLib');
 const check = require('./../libraries/checkLib');
 const token = require('./../libraries/tokenLib');
+const { error } = require('./../libraries/loggerLib');
 
 const IssueModel = mongoose.model('Issue');
 
@@ -102,34 +103,85 @@ let createIssue = (req,res) => {
 
 // End of Create Issue Function
 
-let viewAllIssue = (req,res) => {
-    let pageLimit = parseInt(req.query.pageSize);
-    IssueModel.find({})
-    .limit(pageLimit)
-    .select('-__v -_id')
-            .lean()
-            .exec((err,issues) => {
+//Start of View All Issue Function
+
+let viewAllIssue = (request,resp) =>
+{
+    let issueTotalCount;
+    let pageLimit = parseInt(request.query.pageSize);
+    let pageNumber = parseInt(request.query.pageNumber);
+    let getIssueCount = () =>
+    {
+        return new Promise((resolve,reject)=>
+        {
+            IssueModel.estimatedDocumentCount({},(err,count)=>
+            {
                 if(err)
                 {
-                    logger.error(err.message,"View All Issue : Issue Controller",10);
-                    let apiResponse = response.generate(true,'Unable to find Issues',500,null);
-                    res.send(apiResponse);
-                }
-                else if(check.isEmpty(issues))
-                {
-                    logger.error(err.message,"ViewAllIssue: Issue Controller",10);
-                    let apiResponse = response.generate(true,'No Issues Found',400,null);
-                    res.send(apiResponse);
+                console.log(err);
+                reject(err)
                 }
                 else
                 {
-                    let apiResponse = response.generate(false,'Found the List of All Issue',200,issues);
-                    console.log(issues);
-                    res.send(apiResponse);
+                    issueTotalCount = count;
+                    resolve(count);
                 }
+
             })
-}
-//End of View All Issues
+        })
+        
+    }
+
+    let findIssue = () =>
+    {
+        return new Promise((resolve,reject)=>
+        {
+            IssueModel.find({})
+            .skip(pageNumber*pageLimit)
+            .limit(pageLimit) 
+            .select('-__v -_id')
+                .lean()
+                .exec((err,issues) => 
+                {
+                    if(err)
+                    {
+                        logger.error(err.message,"View All Issue : Issue Controller",10);
+                        let apiResponse = response.generate(true,'Unable to find Issues',500,null);
+                        reject(apiResponse);
+                    }
+                    else if(check.isEmpty(issues))
+                    {
+                        logger.error(err.message,"ViewAllIssue: Issue Controller",10);
+                        let apiResponse = response.generate(true,'No Issues Found',400,null);
+                        reject(apiResponse);
+                    }
+                    else
+                    {
+                        let apiResponse = response.generate(false,'Found the List of All Issue',200,issues);
+                        resolve(apiResponse);
+                    }
+            })
+        })
+    }
+
+        getIssueCount().
+        then(findIssue)
+        .then((resolve) => 
+        {
+            let apiResponse = response.generate(false,'List Of Issue',200,resolve);
+            apiResponse.data.issueCount = issueTotalCount;
+            resp.send(apiResponse);
+        })
+        .catch((err)=>
+        {
+            resp.send(err);
+        });    
+
+        
+    }
+
+
+
 
 let getSingleIssue = (req,res) => {
     IssueModel.findOne({'issueId':req.params.issueId})
