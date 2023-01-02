@@ -11,7 +11,7 @@ module.exports.setRouter = (app) => {
 
     app.get(`${baseUrl}/viewAllIssue`,issueController.viewAllIssue);
 
-    app.get(`${baseUrl}/viewIssue/:issueId`,issueController.getSingleIssue);
+    app.get(`${baseUrl}/viewIssue`,issueController.getSingleIssue);
 
     app.put(`${baseUrl}/updateIssue/:issueId`,issueController.updateIssue);
 

@@ -184,10 +184,13 @@ let viewAllIssue = (request,resp) =>
 
 
 let getSingleIssue = (req,res) => {
-    IssueModel.findOne({'issueId':req.params.issueId})
+    console.log(req);
+    console.log(req.query.issueId);
+    IssueModel.findOne({'issueId':req.query.issueId})
     .select('-__v -_id')
     .lean()
     .exec((err,result)=>{
+        console.log(result);
         if(err)
         {
             logger.error(err.message,'Get Single issue',30);
